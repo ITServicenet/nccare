@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<info xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	  xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
+	<id>nccare</id>
+	<name>NC Care</name>
+	<summary>Keep an eye on the health of your Nextcloud: updates, security checks and alerts.</summary>
+	<description><![CDATA[NC Care by ITServicenet reviews the technical health of your Nextcloud and reports it to the NC Care portal, so you can follow it over time and get an alert when something needs attention.
+
+**What the app sends.** At the interval you choose (daily, weekly or monthly) it sends a report with non-sensitive technical information only: Nextcloud and PHP versions, database type, aggregate user counts, the list of enabled apps, the background job mode, the results of the automatic checks and, when available, hardware statistics. **It never sends files, user names or the content of your instance.** The full list is shown in the app settings.
+
+**How it works.**
+1. Enable the app. It registers the instance with the NC Care portal on its own and sends a first report.
+2. A new instance is *pending approval* until ITServicenet approves it. Create an account on the portal with the instance address and the identifier shown in the app settings.
+3. Once approved, reports arrive on schedule and you can configure alerts by email or Telegram, uptime monitoring and the weekly summary.
+
+Requires administrator rights. Reports go to the portal address shown in the app settings.]]></description>
+	<version>1.0.0</version>
+	<licence>AGPL-3.0-or-later</licence>
+	<author mail="nccare@itservicenet.net" homepage="https://itservicenet.net">ITServicenet</author>
+	<namespace>NCCare</namespace>
+	<documentation>
+		<admin>https://nc-care.itservicenet.net/landing-page</admin>
+	</documentation>
+	<category>integration</category>
+	<category>monitoring</category>
+	<category>tools</category>
+	<website>https://nc-care.itservicenet.net/landing-page</website>
+	<bugs>https://itservicenet.net/contattaci/</bugs>
+	<dependencies>
+		<!--
+			PHP 8.5 is not listed on purpose: Nextcloud itself refuses to start on it
+			(lib/versioncheck.php aborts from 8.5.0), so it cannot be a target.
+			Nextcloud 30 in turn supports PHP up to 8.3, which is why the floor sits
+			there: it is the only version usable across the whole 30 to 34 window.
+		-->
+		<php min-version="8.3" max-version="8.4"/>
+		<nextcloud min-version="30" max-version="34"/>
+	</dependencies>
+	<background-jobs>
+		<job>OCA\NCCare\BackgroundJob\SupportReportJob</job>
+	</background-jobs>
+	<settings>
+		<admin>OCA\NCCare\Settings\AdminSettings</admin>
+		<admin-section>OCA\NCCare\Settings\AdminSection</admin-section>
+	</settings>
+</info>
