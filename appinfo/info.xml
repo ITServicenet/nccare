@@ -14,7 +14,7 @@
 3. Once approved, reports arrive on schedule and you can configure alerts by email or Telegram, uptime monitoring and the weekly summary.
 
 Requires administrator rights. Reports go to the portal address shown in the app settings.]]></description>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<licence>AGPL-3.0-or-later</licence>
 	<author mail="nccare@itservicenet.net" homepage="https://itservicenet.net">ITServicenet</author>
 	<namespace>NCCare</namespace>

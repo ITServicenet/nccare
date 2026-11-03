@@ -3,6 +3,12 @@
 All notable changes to NC Care are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.0.1 - 2026-11-03
+
+### Changed
+- Contact address is now nccare@itservicenet.net.
+- Updated front-end dependencies to fix known vulnerabilities (DOMPurify, follow-redirects and others).
+
 ## 1.0.0 - 2026-11-02
 
 ### Added
