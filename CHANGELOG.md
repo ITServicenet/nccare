@@ -3,6 +3,28 @@
 All notable changes to NC Care are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.0.4 - 2026-11-06
+
+### Changed
+- Compatible with Nextcloud 35 (the manifest now declares 30 to 35) and with PHP 8.5, which Nextcloud 35 supports.
+- Where Nextcloud deprecated an API (`OCP\Util::getVersion()` and `getChannel()`, `IAppManager::isInstalled()` and
+  `getInstalledApps()`), the app uses the new one when it exists and keeps the old one only for older servers.
+- The admin settings page uses the `TemplateResponse::RENDER_AS_BLANK` constant instead of a literal string.
+- Store description reworded in Italian and English: schedule wording, a separate note on what is never sent, the
+  registration and approval steps, and a line saying ITServicenet is a Nextcloud Platinum partner that supports the app.
+
+## 1.0.3 - 2026-11-06
+
+### Changed
+- Store listing: description and summary in Italian (shown to browsers set to Italian, English for everyone else) and four screenshots
+  of the app settings page.
+
+## 1.0.2 - 2026-11-05
+
+### Changed
+- Store listing: banner and screenshots of the NC Care portal.
+- First version published to the Nextcloud App Store automatically from the release pipeline.
+
 ## 1.0.1 - 2026-11-03
 
 ### Changed

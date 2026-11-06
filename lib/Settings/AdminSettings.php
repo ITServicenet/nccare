@@ -11,7 +11,7 @@ use OCP\Settings\ISettings;
 class AdminSettings implements ISettings {
 
 	public function getForm(): TemplateResponse {
-		return new TemplateResponse(Application::APP_ID, 'admin', [], 'blank');
+		return new TemplateResponse(Application::APP_ID, 'admin', [], TemplateResponse::RENDER_AS_BLANK);
 	}
 
 	public function getSection(): string {

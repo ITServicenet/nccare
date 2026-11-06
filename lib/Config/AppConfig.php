@@ -22,7 +22,7 @@ class AppConfig {
 	 * Current version of the NC Care app.
 	 * Included in every report payload sent to the backend.
 	 */
-	public const string APP_VERSION = '1.0.1';
+	public const string APP_VERSION = '1.0.4';
 
 	/** Report payload schema version understood by the backend. */
 	public const int REPORT_VERSION = 2;

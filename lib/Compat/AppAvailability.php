@@ -31,10 +31,14 @@ class AppAvailability {
 	public function isEnabled(string $appId): bool {
 		try {
 			if ($this->hasModernEnabledCheck) {
-				/** @psalm-suppress UndefinedInterfaceMethod only present from Nextcloud 32, guarded by method_exists() above */
+				/**
+				 * @psalm-suppress UndefinedInterfaceMethod only present from Nextcloud 32, guarded by method_exists() above
+				 * @psalm-suppress RedundantCast the cast keeps the analysis clean against the 30 and 31 stubs, where the method is unknown
+				 */
 				return (bool)$this->appManager->isEnabledForAnyone($appId);
 			}
 
+			/** @psalm-suppress DeprecatedMethod only reached on servers older than 32, which do not have the replacement */
 			return $this->appManager->isInstalled($appId);
 		} catch (\Throwable) {
 			return false;
@@ -48,15 +52,20 @@ class AppAvailability {
 	 */
 	public function getEnabledApps(): array {
 		try {
-			/** @psalm-suppress UndefinedInterfaceMethod only present on newer servers, guarded by method_exists() in the constructor */
+			/**
+			 * @psalm-suppress UndefinedInterfaceMethod only present on newer servers, guarded by method_exists() in the constructor
+			 * @psalm-suppress DeprecatedMethod the fallback is only reached on servers older than 32
+			 */
 			$apps = $this->hasModernAppList
 				? $this->appManager->getEnabledApps()
 				: $this->appManager->getInstalledApps();
 
+			/** @psalm-suppress DocblockTypeContradiction the stubs of newer servers type the result, older ones do not */
 			if (!is_array($apps)) {
 				return [];
 			}
 
+			/** @psalm-suppress RedundantConditionGivenDocblockType same reason as above */
 			return array_values(array_filter($apps, 'is_string'));
 		} catch (\Throwable) {
 			return [];

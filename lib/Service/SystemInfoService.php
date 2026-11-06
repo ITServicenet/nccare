@@ -212,8 +212,30 @@ class SystemInfoService {
 	public function getNextcloudVersion(): string {
 		return implode('.', array_map(
 			static fn (mixed $part): string => is_scalar($part) ? (string)$part : '',
-			\OCP\Util::getVersion(),
+			$this->getServerVersionParts(),
 		));
+	}
+
+	/**
+	 * Version of the server as [major, minor, patch, build]. OCP\ServerVersion exists from
+	 * Nextcloud 31 (OCP\Util::getVersion() is deprecated since then); Nextcloud 30 only has the old one.
+	 *
+	 * @return array<array-key, mixed>
+	 *
+	 * @psalm-suppress MixedInferredReturnType the 30 stubs do not know OCP\ServerVersion, so that branch is mixed there
+	 */
+	private function getServerVersionParts(): array {
+		if (class_exists(\OCP\ServerVersion::class)) {
+			/**
+			 * @psalm-suppress UndefinedClass the class is not in the stubs of Nextcloud 30, guarded by class_exists()
+			 * @psalm-suppress MixedMethodCall same reason
+			 * @psalm-suppress MixedReturnStatement same reason
+			 */
+			return \OCP\Server::get(\OCP\ServerVersion::class)->getVersion();
+		}
+
+		/** @psalm-suppress DeprecatedMethod only reached on Nextcloud 30, which has no ServerVersion */
+		return \OCP\Util::getVersion();
 	}
 
 	/**
@@ -240,8 +262,21 @@ class SystemInfoService {
 		return $available;
 	}
 
+	/**
+	 * @psalm-suppress MixedInferredReturnType the 30 stubs do not know OCP\ServerVersion, so that branch is mixed there
+	 */
 	private function getUpdateChannel(): string {
 		try {
+			if (class_exists(\OCP\ServerVersion::class)) {
+				/**
+				 * @psalm-suppress UndefinedClass the class is not in the stubs of Nextcloud 30, guarded by class_exists()
+				 * @psalm-suppress MixedMethodCall same reason
+				 * @psalm-suppress MixedReturnStatement same reason
+				 */
+				return \OCP\Server::get(\OCP\ServerVersion::class)->getChannel();
+			}
+
+			/** @psalm-suppress DeprecatedMethod only reached on Nextcloud 30, which has no ServerVersion */
 			return \OCP\Util::getChannel();
 		} catch (\Throwable) {
 			return '';
