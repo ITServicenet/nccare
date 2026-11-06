@@ -15,8 +15,7 @@ something needs attention.
 
 ## What the app sends
 
-At the interval you choose (daily, weekly or monthly) the app sends a report with
-non-sensitive technical information only: Nextcloud and PHP versions, database type,
+The app sends a report with non-sensitive technical information only: Nextcloud and PHP versions, database type,
 aggregate user counts, the list of enabled apps, the background job mode, the results of the
 automatic checks and, when available, hardware statistics.
 **It never sends files, user names or the content of your instance.** The full list is shown

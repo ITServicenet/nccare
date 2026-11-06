@@ -3,6 +3,13 @@
 All notable changes to NC Care are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.0.5 - 2026-11-06
+
+### Changed
+- Store description: removed the statement that the schedule of the reports can be chosen. The app does not offer that choice;
+  the report is sent regularly by the Nextcloud background job. The same correction applies to the public README and to the
+  first release notes.
+
 ## 1.0.4 - 2026-11-06
 
 ### Changed
@@ -36,8 +43,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 - First stable release. The app collects non-sensitive technical information about the Nextcloud
   instance (Nextcloud and PHP versions, database type, aggregate user counts, enabled apps, background
-  job mode, results of automatic checks) and sends it to the NC Care portal run by ITServicenet, on a
-  daily, weekly or monthly schedule.
+  job mode, results of automatic checks) and sends it regularly to the NC Care portal run by
+  ITServicenet.
 - Registration without secrets: a new instance registers by itself, sends a first report and waits for
   ITServicenet to approve it. The admin settings page shows the approval status and refreshes it.
 - Admin settings page with registration status, connection test, manual run and registration reset.

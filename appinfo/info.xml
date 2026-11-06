@@ -7,33 +7,33 @@
 	<summary lang="it">Tieni sotto controllo la salute della tua Nextcloud: aggiornamenti, controlli di sicurezza e avvisi.</summary>
 	<description><![CDATA[NC Care by ITServicenet checks the technical health of your Nextcloud installation and sends it to the NC Care portal, so you can monitor it over time and get an alert when something needs attention.
 
-**What the app sends.** Depending on the schedule you choose (daily, weekly or monthly), a report is sent with non-sensitive technical information only: Nextcloud and PHP versions, database type, aggregate user counts, the list of enabled apps, the background job mode, the results of the automatic checks and, when available, hardware statistics. The full list is shown in the app settings.
+**What the app sends.** A report is sent with non-sensitive technical information only: Nextcloud and PHP versions, database type, aggregate user counts, the list of enabled apps, the background job mode, the results of the automatic checks and, when available, hardware statistics. The full list is shown in the app settings.
 
 **NB: files, user names or any other content of your Nextcloud instance are never sent.**
 
 **How it works.**
 1. Enable the app: this registers your instance with the NC Care portal and sends a first report. Note: a new instance stays *pending approval* until ITServicenet verifies it.
 2. Create an account on the portal with the instance address and the identifier shown in the app settings.
-3. After approval you will receive reports on the schedule you chose, and you can set up alerts by email or Telegram, availability monitoring and the weekly summary.
+3. After approval you will receive reports regularly, and you can set up alerts by email or Telegram, availability monitoring and the weekly summary.
 
 Administrator rights are required to configure it. Reports are sent to the portal address shown in the app settings.
 
 ITServicenet is a Nextcloud Platinum partner and officially supports this app.]]></description>
 	<description lang="it"><![CDATA[NC Care di ITServicenet controlla lo stato di salute della tua installazione Nextcloud dal punto di vista tecnico e lo invia al portale NC Care, così puoi monitorarla nel tempo e ricevere un avviso quando qualcosa richiede attenzione.
 
-**Cosa invia l'app.** A seconda della finestra temporale scelta (giornaliera, settimanale o mensile) viene inviato un report con sole informazioni tecniche non sensibili: versioni di Nextcloud e PHP, tipo di database, conteggi aggregati degli utenti, elenco delle app abilitate, modalità dei processi in background, esito dei controlli automatici e, quando disponibili, statistiche hardware. L'elenco completo è nelle impostazioni dell'app.
+**Cosa invia l'app.** Viene inviato un report con sole informazioni tecniche non sensibili: versioni di Nextcloud e PHP, tipo di database, conteggi aggregati degli utenti, elenco delle app abilitate, modalità dei processi in background, esito dei controlli automatici e, quando disponibili, statistiche hardware. L'elenco completo è nelle impostazioni dell'app.
 
 **NB: non vengono mai inviati file, nomi utente o altri contenuti della tua istanza Nextcloud.**
 
 **Come funziona.**
 1. Abilita l'app: questo permette di registrare la tua istanza presso il portale NC Care e invia un primo report. Nota: una nuova istanza resta *in attesa di approvazione* finché ITServicenet non la verifica.
 2. Crea un account sul portale con l'indirizzo dell'istanza e l'identificativo mostrati nelle impostazioni dell'app.
-3. Dopo l'approvazione riceverai i report secondo la pianificazione da te scelta e potrai configurare avvisi via email o Telegram, il monitoraggio della raggiungibilità e il riepilogo settimanale.
+3. Dopo l'approvazione riceverai i report con regolarità e potrai configurare avvisi via email o Telegram, il monitoraggio della raggiungibilità e il riepilogo settimanale.
 
 Servono i permessi di amministratore per configurarla. I report vengono inviati all'indirizzo del portale mostrato nelle impostazioni dell'app.
 
 ITServicenet è partner platinum di Nextcloud e supporta ufficialmente questa app.]]></description>
-	<version>1.0.4</version>
+	<version>1.0.5</version>
 	<licence>AGPL-3.0-or-later</licence>
 	<author mail="nccare@itservicenet.net" homepage="https://itservicenet.net">ITServicenet</author>
 	<namespace>NCCare</namespace>
