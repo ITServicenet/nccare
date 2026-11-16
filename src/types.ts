@@ -38,6 +38,11 @@ export interface Status {
 	registered: boolean
 	/** Registered, but waiting for ITServicenet to approve it: only the first report goes out until then. */
 	approval_pending: boolean
+	/**
+	 * Linked to an account on the portal. False invites the administrator to register; null means the backend has
+	 * not said (unreachable or too old), and nothing is shown.
+	 */
+	account_linked: boolean | null
 	last_success_at: string
 	last_error_at: string
 	last_error_message: string

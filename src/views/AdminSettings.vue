@@ -43,6 +43,7 @@ const status = ref<Status>({
 	status: 'not_registered',
 	registered: false,
 	approval_pending: false,
+	account_linked: null,
 	last_success_at: '',
 	last_error_at: '',
 	last_error_message: '',
@@ -78,6 +79,9 @@ const statusLabel = computed<Record<string, string>>(() => ({
 	not_registered: t(APP_ID, 'Not registered'),
 	error: t(APP_ID, 'Error'),
 }))
+
+/** Until the instance is linked to a portal account the page asks to register; it goes away once it is. */
+const showRegistrationBanner = computed(() => status.value.account_linked === false && status.value.register_url !== '')
 
 const statusVariant = computed(() => ({
 	registered: 'ok',
@@ -192,6 +196,16 @@ onMounted(() => {
 		<NcLoadingIcon v-if="loading" :size="64" />
 
 		<template v-else>
+			<NcNoteCard v-if="showRegistrationBanner" type="warning" class="its__register">
+				<p>
+					<strong>{{ t('nccare', 'Registration not completed.') }}</strong>
+					{{ t('nccare', 'This instance is not linked to an account on the NC Care portal yet. To use all the features (alerts, uptime monitoring, summaries) create your account: you need the address and the identifier shown on this page.') }}
+				</p>
+				<NcButton type="primary" :href="status.register_url" target="_blank">
+					{{ t('nccare', 'Register on the portal') }}
+				</NcButton>
+			</NcNoteCard>
+
 			<!-- ── 1. THE APP ────────────────────────────────────────────── -->
 			<NcSettingsSection :name="APP_NAME"
 				:description="t('nccare', 'Nextcloud Care - Controlla. Proteggi. Migliora.')">

@@ -3,6 +3,18 @@
 All notable changes to NC Care are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.0.6 - 2026-11-16
+
+### Added
+- The admin settings page shows a notice inviting to register on the NC Care portal while the instance is not linked to
+  an account there. It goes away on its own once the account exists. A portal that does not report it, or does not
+  answer, shows nothing.
+
+### Changed
+- Store description in Italian and English: what you get by installing the app (5 free support tickets, a basic
+  evaluation of the instance and of its governance) and the optional services, with links to the NC Care page and to the
+  source code on GitHub. The manifest now declares the repository.
+
 ## 1.0.5 - 2026-11-06
 
 ### Changed

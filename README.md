@@ -9,8 +9,8 @@ something needs attention.
 |---|---|
 | App ID | `nccare` |
 | Version | see [`CHANGELOG.md`](CHANGELOG.md) |
-| Nextcloud | 30 to 34 |
-| PHP | 8.3 to 8.4 |
+| Nextcloud | 30 to 35 |
+| PHP | 8.3 to 8.5 |
 | License | AGPL-3.0-or-later |
 
 ## What the app sends

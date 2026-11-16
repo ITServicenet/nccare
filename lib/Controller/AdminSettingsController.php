@@ -47,6 +47,8 @@ class AdminSettingsController extends OCSController {
 
 		// Waiting for approval: ask the backend, so a page opened after the approval already shows "registered".
 		$this->registrationService->refreshApprovalStatus();
+		// And whether somebody has already created the portal account for it: until then the page invites to do so.
+		$this->registrationService->refreshAccountStatus();
 
 		$installationToken = $this->appConfig->getValueString(Application::APP_ID, 'installation_token', '');
 		$lastErrorAt = $this->appConfig->getValueString(Application::APP_ID, 'last_error_at', '');
@@ -70,6 +72,9 @@ class AdminSettingsController extends OCSController {
 			// offered to the administrator has to reflect that.
 			'registered' => $installationToken !== '',
 			'approval_pending' => $approvalPending,
+			// Linked to an account on the portal: false also while the instance is not registered yet (it cannot
+			// have an account), null when the backend has not said (unreachable or too old), which shows nothing.
+			'account_linked' => $installationToken === '' ? false : $this->registrationService->isAccountLinked(),
 			'last_success_at' => $this->appConfig->getValueString(Application::APP_ID, 'last_success_at', ''),
 			'last_error_at' => $lastErrorAt,
 			'last_error_message' => $this->appConfig->getValueString(Application::APP_ID, 'last_error_message', ''),
@@ -168,6 +173,7 @@ class AdminSettingsController extends OCSController {
 		$this->appConfig->setValueString(Application::APP_ID, 'installation_id', '');
 		$this->appConfig->setValueString(Application::APP_ID, 'installation_token', '');
 		$this->appConfig->setValueString(Application::APP_ID, 'approval_pending', '');
+		$this->appConfig->setValueString(Application::APP_ID, 'account_linked', '');
 		$this->appConfig->setValueString(Application::APP_ID, 'last_success_at', '');
 		$this->appConfig->setValueString(Application::APP_ID, 'last_error_at', '');
 		$this->appConfig->setValueString(Application::APP_ID, 'last_error_message', '');

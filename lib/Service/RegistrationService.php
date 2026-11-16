@@ -313,6 +313,44 @@ class RegistrationService {
 		}
 	}
 
+	/**
+	 * Asks the backend whether someone has already linked this instance to an account on the portal, and remembers the
+	 * answer for the settings page, which invites the administrator to register until it is yes. Best effort: a backend
+	 * that is unreachable, or too old to know the field, leaves the last answer alone (and with none, nothing is shown).
+	 */
+	public function refreshAccountStatus(): void {
+		$token = $this->appConfig->getValueString(Application::APP_ID, 'installation_token', '');
+		if ($token === '') {
+			return;
+		}
+
+		try {
+			$response = $this->clientService->newClient()->get(
+				$this->itsConfig->getBackendUrl() . '/api/v1/installation/status',
+				['timeout' => 5, 'headers' => ['Authorization' => 'Bearer ' . $token]],
+			);
+			/** @psalm-suppress MixedAssignment json_decode() returns mixed by design; the shape is checked on the next line */
+			$body = json_decode((string)$response->getBody(), true);
+			if (is_array($body) && is_bool($body['account_linked'] ?? null)) {
+				$this->appConfig->setValueString(Application::APP_ID, 'account_linked', $body['account_linked'] ? '1' : '0');
+			}
+		} catch (\Throwable $e) {
+			$this->logger->info('NC Care:could not refresh the account status: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+		}
+	}
+
+	/**
+	 * Whether the instance is linked to an account on the portal, as last told by the backend; null when it never said
+	 * (no answer yet, or a backend that does not report it).
+	 */
+	public function isAccountLinked(): ?bool {
+		return match ($this->appConfig->getValueString(Application::APP_ID, 'account_linked', '')) {
+			'1' => true,
+			'0' => false,
+			default => null,
+		};
+	}
+
 	/** The refusal of a report, told apart: waiting for approval, or not accepted. */
 	private function refusal(int $status, \Throwable $e): \RuntimeException {
 		if ($status === 403 && $this->errorCodeOf($e) === 'installation_pending') {
