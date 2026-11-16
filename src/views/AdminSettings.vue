@@ -44,6 +44,7 @@ const status = ref<Status>({
 	registered: false,
 	approval_pending: false,
 	account_linked: null,
+	approval_expires_at: '',
 	last_success_at: '',
 	last_error_at: '',
 	last_error_message: '',
@@ -71,23 +72,52 @@ const showResetDialog = ref(false)
  * section, where a banner at the top of the page would go unnoticed.
  */
 const connectionResult = ref<'reachable' | 'unreachable' | null>(null)
-const reportResult = ref<'sent' | 'registered' | 'pending' | 'busy' | 'failed' | 'registration_failed' | null>(null)
+const reportResult = ref<'sent' | 'registered' | 'pending' | 'busy' | 'expired' | 'failed' | 'registration_failed' | null>(null)
 
 const statusLabel = computed<Record<string, string>>(() => ({
 	registered: t(APP_ID, 'Registered'),
 	pending: t(APP_ID, 'Awaiting approval'),
 	not_registered: t(APP_ID, 'Not registered'),
 	error: t(APP_ID, 'Error'),
+	expired: t(APP_ID, 'Expired'),
 }))
 
-/** Until the instance is linked to a portal account the page asks to register; it goes away once it is. */
-const showRegistrationBanner = computed(() => status.value.account_linked === false && status.value.register_url !== '')
+/** The registration waited for approval too long without an account: nothing is sent until it is made again. */
+const registrationExpired = computed(() => status.value.status === 'expired')
+
+/**
+ * Until the instance is linked to a portal account the page asks to register; it goes away once it is. An expired
+ * registration has its own notice, which asks to register the instance again.
+ */
+const showRegistrationBanner = computed(() => status.value.account_linked === false
+	&& status.value.register_url !== ''
+	&& !registrationExpired.value)
+
+/** Days left before the registration expires if nobody creates an account (null when there is no deadline). */
+const daysUntilExpiry = computed<number | null>(() => {
+	if (!status.value.approval_expires_at) {
+		return null
+	}
+	const ms = new Date(status.value.approval_expires_at).getTime() - Date.now()
+	return Number.isNaN(ms) ? null : Math.max(0, Math.ceil(ms / 86400000))
+})
+
+const expiryDate = computed(() => {
+	if (daysUntilExpiry.value === null) {
+		return ''
+	}
+	return new Date(status.value.approval_expires_at).toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
+})
+
+/** The warning turns red when only a few days are left. */
+const registrationBannerType = computed(() => (daysUntilExpiry.value !== null && daysUntilExpiry.value <= 3 ? 'error' : 'warning'))
 
 const statusVariant = computed(() => ({
 	registered: 'ok',
 	pending: 'warn',
 	not_registered: 'warn',
 	error: 'error',
+	expired: 'error',
 }[status.value.status] ?? 'warn'))
 
 // ─── Loading ────────────────────────────────────────────────────────────────
@@ -132,7 +162,7 @@ async function runNow() {
 	try {
 		const res = await axios.post(ocs('admin/run-now'))
 		const outcome = res.data.ocs.data.status
-		reportResult.value = ['registered', 'pending', 'busy'].includes(outcome) ? outcome : 'sent'
+		reportResult.value = ['registered', 'pending', 'busy', 'expired'].includes(outcome) ? outcome : 'sent'
 	} catch (e) {
 		reportResult.value = wasRegistering ? 'registration_failed' : 'failed'
 		// The chip alone does not say why; the reason belongs in the banner and
@@ -196,10 +226,26 @@ onMounted(() => {
 		<NcLoadingIcon v-if="loading" :size="64" />
 
 		<template v-else>
-			<NcNoteCard v-if="showRegistrationBanner" type="warning" class="its__register">
+			<NcNoteCard v-if="registrationExpired" type="error" class="its__register">
+				<p>
+					<strong>{{ t('nccare', 'Registration expired.') }}</strong>
+					{{ t('nccare', 'This instance was not approved in time, so its registration has expired and no more reports are sent. To use NC Care, register the instance again.') }}
+				</p>
+				<NcButton type="primary" :disabled="resetting" @click="confirmReset">
+					<template #icon>
+						<NcLoadingIcon v-if="resetting" :size="20" />
+					</template>
+					{{ t('nccare', 'Register again') }}
+				</NcButton>
+			</NcNoteCard>
+
+			<NcNoteCard v-if="showRegistrationBanner" :type="registrationBannerType" class="its__register">
 				<p>
 					<strong>{{ t('nccare', 'Registration not completed.') }}</strong>
 					{{ t('nccare', 'This instance is not linked to an account on the NC Care portal yet. To use all the features (alerts, uptime monitoring, summaries) create your account: you need the address and the identifier shown on this page.') }}
+				</p>
+				<p v-if="expiryDate">
+					{{ t('nccare', 'If you do not register, the registration of this instance expires on {date}.', { date: expiryDate }) }}
 				</p>
 				<NcButton type="primary" :href="status.register_url" target="_blank">
 					{{ t('nccare', 'Register on the portal') }}
@@ -283,13 +329,14 @@ onMounted(() => {
 
 					<span v-else-if="reportResult"
 						class="chip"
-						:class="reportResult === 'sent' || reportResult === 'registered' ? 'chip--ok' : (reportResult === 'pending' || reportResult === 'busy' ? 'chip--warn' : 'chip--error')">
+						:class="reportResult === 'sent' || reportResult === 'registered' ? 'chip--ok' : (reportResult === 'pending' || reportResult === 'busy' || reportResult === 'expired' ? 'chip--warn' : 'chip--error')">
 						<span class="chip__dot" />
 						{{ {
 							sent: t('nccare', 'Report sent'),
 							registered: t('nccare', 'Instance registered'),
 							pending: t('nccare', 'Awaiting approval'),
 							busy: t('nccare', 'Already in progress'),
+							expired: t('nccare', 'Registration expired'),
 							failed: t('nccare', 'Report not sent'),
 							registration_failed: t('nccare', 'Registration failed'),
 						}[reportResult] }}

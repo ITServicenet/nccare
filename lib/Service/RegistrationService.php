@@ -6,6 +6,7 @@ namespace OCA\NCCare\Service;
 
 use OCA\NCCare\AppInfo\Application;
 use OCA\NCCare\Config\AppConfig;
+use OCA\NCCare\Exception\InstallationExpiredException;
 use OCA\NCCare\Exception\InstallationPendingException;
 use OCA\NCCare\Exception\InstallationRejectedException;
 use OCP\Http\Client\IClientService;
@@ -74,6 +75,11 @@ class RegistrationService {
 			if ($this->statusOf($e) === 403 && $this->errorCodeOf($e) === 'installation_disabled') {
 				throw new InstallationRejectedException(403, $e);
 			}
+			// The identifier waited too long for an account: the registration is over, and a new one needs a new
+			// identifier, which "Register again" generates.
+			if ($this->statusOf($e) === 403 && $this->errorCodeOf($e) === 'installation_expired') {
+				throw new InstallationExpiredException($e);
+			}
 			throw $e;
 		}
 
@@ -103,6 +109,9 @@ class RegistrationService {
 		);
 		// A new installation starts "pending": it may send its first report and then waits for approval.
 		$this->setApprovalPending(($body['installation_status'] ?? null) === 'pending');
+		// A fresh registration is a fresh start: whatever expired before no longer applies.
+		$this->setExpired(false);
+		$this->storeApprovalExpiry($body['approval_expires_at'] ?? null);
 		$this->saveSuccess();
 	}
 
@@ -216,7 +225,11 @@ class RegistrationService {
 	 * together on a new instance: both would find no installation id, each would make up its own and register,
 	 * and the backend would list the same instance twice. The second one finds the lock taken and does nothing.
 	 *
-	 * @return 'registered'|'report_sent'|'pending'|'busy'
+	 * A registration that expired (waiting for approval for too long without an account) is a state too: the round ends
+	 * as 'expired' without sending anything, and the settings page asks the administrator to register again. The only
+	 * thing asked of the backend in that state is whether the staff approved it again after all.
+	 *
+	 * @return 'registered'|'report_sent'|'pending'|'busy'|'expired'
 	 * @throws \Throwable whatever stopped the round, for the caller to record
 	 */
 	public function synchronise(): string {
@@ -227,7 +240,14 @@ class RegistrationService {
 		}
 
 		try {
+			if ($this->isExpired() && !$this->approvedAgainAfterExpiry()) {
+				return 'expired';
+			}
+
 			return $this->synchroniseLocked();
+		} catch (InstallationExpiredException) {
+			$this->markExpired();
+			return 'expired';
 		} finally {
 			$this->locks->releaseLock(self::LOCK, ILockingProvider::LOCK_EXCLUSIVE);
 		}
@@ -331,12 +351,81 @@ class RegistrationService {
 			);
 			/** @psalm-suppress MixedAssignment json_decode() returns mixed by design; the shape is checked on the next line */
 			$body = json_decode((string)$response->getBody(), true);
-			if (is_array($body) && is_bool($body['account_linked'] ?? null)) {
+			if (!is_array($body)) {
+				return;
+			}
+			if (is_bool($body['account_linked'] ?? null)) {
 				$this->appConfig->setValueString(Application::APP_ID, 'account_linked', $body['account_linked'] ? '1' : '0');
+			}
+			// When the registration will expire if nobody claims it (only told while it waits and has no account).
+			$this->storeApprovalExpiry($body['approval_expires_at'] ?? null);
+
+			// The same answer says whether the registration has expired, or has been approved again after expiring.
+			/** @psalm-suppress MixedAssignment the body is JSON from the backend: only compared with known words below */
+			$state = $body['status'] ?? null;
+			if ($state === 'expired') {
+				$this->markExpired();
+			} elseif ($state === 'active' && $this->isExpired()) {
+				$this->setExpired(false);
+				$this->setApprovalPending(false);
 			}
 		} catch (\Throwable $e) {
 			$this->logger->info('NC Care:could not refresh the account status: ' . $e->getMessage(), ['app' => Application::APP_ID]);
 		}
+	}
+
+	/** The registration expired: it waited for approval too long without an account. Nothing is sent until it is renewed. */
+	public function isExpired(): bool {
+		return $this->appConfig->getValueString(Application::APP_ID, 'registration_expired', '') === '1';
+	}
+
+	/** When the registration expires unless an account is created, as an ISO 8601 string; '' when it does not. */
+	public function getApprovalExpiresAt(): string {
+		return $this->appConfig->getValueString(Application::APP_ID, 'approval_expires_at', '');
+	}
+
+	private function setExpired(bool $expired): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'registration_expired', $expired ? '1' : '');
+	}
+
+	/** Remembers the expiry state: no approval is awaited any more and there is no deadline to show. */
+	private function markExpired(): void {
+		$this->setExpired(true);
+		$this->setApprovalPending(false);
+		$this->storeApprovalExpiry(null);
+	}
+
+	private function storeApprovalExpiry(mixed $value): void {
+		$this->appConfig->setValueString(Application::APP_ID, 'approval_expires_at', is_string($value) ? $value : '');
+	}
+
+	/**
+	 * After an expiry the only thing worth asking is whether ITServicenet approved the instance anyway: then the
+	 * mark goes and the reports resume. Best effort, any failure leaves it expired.
+	 */
+	private function approvedAgainAfterExpiry(): bool {
+		$token = $this->appConfig->getValueString(Application::APP_ID, 'installation_token', '');
+		if ($token === '') {
+			return false;
+		}
+
+		try {
+			$response = $this->clientService->newClient()->get(
+				$this->itsConfig->getBackendUrl() . '/api/v1/installation/status',
+				['timeout' => 10, 'headers' => ['Authorization' => 'Bearer ' . $token]],
+			);
+			/** @psalm-suppress MixedAssignment json_decode() returns mixed by design; the shape is checked on the next line */
+			$body = json_decode((string)$response->getBody(), true);
+			if (is_array($body) && ($body['status'] ?? null) === 'active') {
+				$this->setExpired(false);
+				$this->setApprovalPending(false);
+				return true;
+			}
+		} catch (\Throwable $e) {
+			$this->logger->info('NC Care:could not check an expired registration: ' . $e->getMessage(), ['app' => Application::APP_ID]);
+		}
+
+		return false;
 	}
 
 	/**
@@ -355,6 +444,9 @@ class RegistrationService {
 	private function refusal(int $status, \Throwable $e): \RuntimeException {
 		if ($status === 403 && $this->errorCodeOf($e) === 'installation_pending') {
 			return new InstallationPendingException($e);
+		}
+		if ($status === 403 && $this->errorCodeOf($e) === 'installation_expired') {
+			return new InstallationExpiredException($e);
 		}
 
 		return new InstallationRejectedException($status, $e);

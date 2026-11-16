@@ -29,7 +29,7 @@ export interface ChecksResponse {
  */
 export interface Status {
 	installation_id: string
-	status: 'registered' | 'pending' | 'not_registered' | 'error'
+	status: 'registered' | 'pending' | 'not_registered' | 'error' | 'expired'
 	/**
 	 * Whether a registration token is held. An instance whose registration
 	 * failed reports status "error" while still needing to register, so the
@@ -43,6 +43,11 @@ export interface Status {
 	 * not said (unreachable or too old), and nothing is shown.
 	 */
 	account_linked: boolean | null
+	/**
+	 * When the registration expires if nobody creates an account for it (ISO 8601); empty when it does not, or is not
+	 * told. An expired registration reports status "expired".
+	 */
+	approval_expires_at: string
 	last_success_at: string
 	last_error_at: string
 	last_error_message: string

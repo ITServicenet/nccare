@@ -61,7 +61,7 @@ A partire da qui il resto è **opzionale**: su richiesta mettiamo a disposizione
 ITServicenet è partner platinum di Nextcloud e supporta ufficialmente NC Care.
 
 **Link utili:** [pagina di NC Care](https://nc-care.itservicenet.net/landing-page) · [codice sorgente su GitHub](https://github.com/ITServicenet/nccare)]]></description>
-	<version>1.0.6</version>
+	<version>1.0.7</version>
 	<licence>AGPL-3.0-or-later</licence>
 	<author mail="nccare@itservicenet.net" homepage="https://itservicenet.net">ITServicenet</author>
 	<namespace>NCCare</namespace>

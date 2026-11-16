@@ -3,6 +3,15 @@
 All notable changes to NC Care are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.0.7 - 2026-11-16
+
+### Added
+- A registration that waited for approval for too long without an account on the NC Care portal expires. The app
+  then stops reporting and shows "Registration expired" with a "Register again" button, which registers the
+  instance again with a new identifier. If ITServicenet approves it after all, the reports resume on their own.
+- The registration notice on the admin settings page says by when the instance has to be registered, and turns red
+  when three days or fewer are left.
+
 ## 1.0.6 - 2026-11-16
 
 ### Added

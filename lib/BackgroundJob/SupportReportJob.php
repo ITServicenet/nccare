@@ -33,6 +33,7 @@ class SupportReportJob extends TimedJob {
 				match ($result) {
 					'registered' => 'NC Care:registration successful',
 					'pending' => 'NC Care:waiting for approval, report not sent',
+					'expired' => 'NC Care:registration expired, report not sent (register the instance again)',
 					'busy' => 'NC Care:another registration or report is already running, skipped',
 					default => 'NC Care:report sent successfully',
 				},

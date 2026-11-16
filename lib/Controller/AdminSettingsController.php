@@ -56,7 +56,13 @@ class AdminSettingsController extends OCSController {
 		$approvalPending = $installationToken !== ''
 			&& $this->appConfig->getValueString(Application::APP_ID, 'approval_pending', '') === '1';
 
-		if ($installationToken !== '') {
+		// The registration waited for approval too long without an account and expired: nothing is sent, and the page
+		// offers to register the instance again.
+		$expired = $installationToken !== '' && $this->registrationService->isExpired();
+
+		if ($expired) {
+			$status = 'expired';
+		} elseif ($installationToken !== '') {
 			$status = $approvalPending ? 'pending' : 'registered';
 		} elseif ($lastErrorAt !== '') {
 			$status = 'error';
@@ -75,6 +81,8 @@ class AdminSettingsController extends OCSController {
 			// Linked to an account on the portal: false also while the instance is not registered yet (it cannot
 			// have an account), null when the backend has not said (unreachable or too old), which shows nothing.
 			'account_linked' => $installationToken === '' ? false : $this->registrationService->isAccountLinked(),
+			// When the registration expires unless an account is created (ISO 8601), '' when it does not or is not told.
+			'approval_expires_at' => $approvalPending && !$expired ? $this->registrationService->getApprovalExpiresAt() : '',
 			'last_success_at' => $this->appConfig->getValueString(Application::APP_ID, 'last_success_at', ''),
 			'last_error_at' => $lastErrorAt,
 			'last_error_message' => $this->appConfig->getValueString(Application::APP_ID, 'last_error_message', ''),
@@ -174,6 +182,8 @@ class AdminSettingsController extends OCSController {
 		$this->appConfig->setValueString(Application::APP_ID, 'installation_token', '');
 		$this->appConfig->setValueString(Application::APP_ID, 'approval_pending', '');
 		$this->appConfig->setValueString(Application::APP_ID, 'account_linked', '');
+		$this->appConfig->setValueString(Application::APP_ID, 'registration_expired', '');
+		$this->appConfig->setValueString(Application::APP_ID, 'approval_expires_at', '');
 		$this->appConfig->setValueString(Application::APP_ID, 'last_success_at', '');
 		$this->appConfig->setValueString(Application::APP_ID, 'last_error_at', '');
 		$this->appConfig->setValueString(Application::APP_ID, 'last_error_message', '');
