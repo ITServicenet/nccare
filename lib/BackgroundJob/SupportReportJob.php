@@ -6,6 +6,7 @@ namespace OCA\NCCare\BackgroundJob;
 
 use OCA\NCCare\AppInfo\Application;
 use OCA\NCCare\Config\AppConfig;
+use OCA\NCCare\Service\RegistrationReminder;
 use OCA\NCCare\Service\RegistrationService;
 use OCP\AppFramework\Utility\ITimeFactory;
 use OCP\BackgroundJob\TimedJob;
@@ -17,6 +18,7 @@ class SupportReportJob extends TimedJob {
 	public function __construct(
 		ITimeFactory $time,
 		private readonly RegistrationService $registrationService,
+		private readonly RegistrationReminder $reminder,
 		AppConfig $itsConfig,
 		private readonly LoggerInterface $logger,
 	) {
@@ -39,6 +41,8 @@ class SupportReportJob extends TimedJob {
 				},
 				['app' => Application::APP_ID],
 			);
+			// After the answer, so the reminder follows the state the backend has just reported.
+			$this->reminder->run();
 		} catch (\Throwable $e) {
 			$this->registrationService->saveError($e);
 			$this->logger->error('NC Care:background job failed: ' . $e->getMessage(), [

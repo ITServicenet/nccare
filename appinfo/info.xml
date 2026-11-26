@@ -11,9 +11,9 @@
 Files, usernames or any other content of your instance are never sent.
 
 **How it works.**
-1. **Enable the app**: your instance is registered on the NC Care portal and a first report is sent. Until ITServicenet verifies it, the new instance remains pending approval.
-2. **Create an account on the portal** using the instance address and the identifier shown in the app settings.
-3. **After approval** the reports arrive regularly. You can then configure email or Telegram alerts, reachability monitoring and the weekly summary.
+1. **Enable the app**: your instance is registered on the NC Care portal and sends a first report. Until ITServicenet verifies it, the instance stays pending approval.
+2. **Complete the registration**: open NC Care in the Administration settings, where you find the first evaluation of your instance, and create an account on the portal. The link in the app opens the sign-up page with the instance identifier already filled in.
+3. **After approval** the reports arrive regularly. You can then set up email or Telegram alerts and reachability monitoring.
 
 Administrator permissions are required to configure the app. Reports are sent to the portal address shown in the app settings.
 
@@ -39,9 +39,9 @@ ITServicenet is a platinum partner of Nextcloud and officially supports NC Care.
 Non vengono mai inviati file, nomi utente o altri contenuti della tua istanza.
 
 **Come funziona.**
-1. **Abilita l'app**: la tua istanza viene registrata sul portale NC Care e viene inviato un primo report. Finché ITServicenet non la verifica, la nuova istanza resta in attesa di approvazione.
-2. **Crea un account sul portale** usando l'indirizzo dell'istanza e l'identificativo mostrati nelle impostazioni dell'app.
-3. **Dopo l'approvazione** i report arrivano con regolarità. Potrai poi configurare gli avvisi via email o Telegram, il monitoraggio della raggiungibilità e il riepilogo settimanale.
+1. **Abilita l'app**: la tua istanza viene registrata sul portale NC Care e invia un primo report. Finché ITServicenet non la verifica, l'istanza resta in attesa di approvazione.
+2. **Completa la registrazione**: apri NC Care nelle impostazioni di amministrazione, dove trovi la prima valutazione della tua istanza, e crea un account sul portale. Il link nell'app apre la pagina di registrazione con l'identificativo dell'istanza già compilato.
+3. **Dopo l'approvazione** i report arrivano con regolarità. Potrai poi configurare gli avvisi via email o Telegram e il monitoraggio della raggiungibilità.
 
 Per configurare l'app servono i permessi di amministratore. I report vengono inviati all'indirizzo del portale indicato nelle impostazioni dell'app.
 
@@ -61,7 +61,7 @@ A partire da qui il resto è **opzionale**: su richiesta mettiamo a disposizione
 ITServicenet è partner platinum di Nextcloud e supporta ufficialmente NC Care.
 
 **Link utili:** [pagina di NC Care](https://nc-care.itservicenet.net/landing-page) · [codice sorgente su GitHub](https://github.com/ITServicenet/nccare)]]></description>
-	<version>1.0.7</version>
+	<version>1.0.8</version>
 	<licence>AGPL-3.0-or-later</licence>
 	<author mail="nccare@itservicenet.net" homepage="https://itservicenet.net">ITServicenet</author>
 	<namespace>NCCare</namespace>

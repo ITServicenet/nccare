@@ -89,7 +89,7 @@ class AdminSettingsController extends OCSController {
 			'app_version' => AppConfig::APP_VERSION,
 			// Sign-up page of the support portal, derived from the configured
 			// portal address so a different deployment points at its own.
-			'register_url' => $this->itsConfig->getPortalUrl() . '/register',
+			'register_url' => $this->registrationService->getRegisterUrl(),
 			'domain' => $this->systemInfoService->getDomain(),
 			'domain_resolved' => $this->systemInfoService->isDomainResolved(),
 		]);

@@ -373,7 +373,7 @@ onMounted(() => {
 
 				<NcNoteCard v-if="status.approval_pending" type="info">
 					<p>
-						{{ t('nccare', 'This instance is waiting for approval by ITServicenet, which has been notified. The first report has been sent; the next ones go out as soon as it is approved. Nothing else is needed.') }}
+						{{ t('nccare', 'This instance is waiting for approval by ITServicenet, which has been notified. The first report has been sent; the next ones go out as soon as it is approved.') }}
 					</p>
 				</NcNoteCard>
 
@@ -404,14 +404,24 @@ onMounted(() => {
 						</template>
 						{{ t('nccare', 'Test connection') }}
 					</NcButton>
+				</div>
 
-					<NcButton type="error" :disabled="resetting" @click="showResetDialog = true">
+				<!--
+					Rarely needed, so it is not offered as one more button beside the daily actions: it opens by
+					itself only when the registration failed or expired, which is when it is the way out.
+				-->
+				<details class="its__advanced" :open="registrationExpired || status.status === 'error'">
+					<summary>{{ t('nccare', 'Advanced options') }}</summary>
+					<p>
+						{{ t('nccare', 'Use this only if the registration failed or expired, or if the instance was cloned or moved to a new address. The current identifier is replaced by a new one.') }}
+					</p>
+					<NcButton type="tertiary" :disabled="resetting" @click="showResetDialog = true">
 						<template #icon>
 							<NcLoadingIcon v-if="resetting" :size="20" />
 						</template>
-						{{ t('nccare', 'Reset registration') }}
+						{{ t('nccare', 'Register again with a new identifier') }}
 					</NcButton>
-				</div>
+				</details>
 			</NcSettingsSection>
 
 			<!-- ── 5. SECURITY & COMPLIANCE REVIEW ───────────────────────── -->
@@ -456,7 +466,7 @@ onMounted(() => {
 
 		<!-- ── RESET DIALOG ──────────────────────────────────────────────── -->
 		<NcDialog v-if="showResetDialog"
-			:name="t('nccare', 'Reset registration')"
+			:name="t('nccare', 'Register again with a new identifier')"
 			:open="showResetDialog"
 			@update:open="showResetDialog = $event">
 			<template #default>
@@ -477,7 +487,7 @@ onMounted(() => {
 					{{ t('nccare', 'Cancel') }}
 				</NcButton>
 				<NcButton type="error" @click="confirmReset">
-					{{ t('nccare', 'Reset registration') }}
+					{{ t('nccare', 'Register again with a new identifier') }}
 				</NcButton>
 			</template>
 		</NcDialog>
@@ -595,6 +605,20 @@ onMounted(() => {
 
 .its__services li {
 	margin-bottom: 6px;
+}
+
+.its__advanced {
+	margin-top: 20px;
+	color: var(--color-text-maxcontrast);
+}
+
+.its__advanced summary {
+	cursor: pointer;
+}
+
+.its__advanced p {
+	margin: 8px 0;
+	max-width: 560px;
 }
 
 .its__links {

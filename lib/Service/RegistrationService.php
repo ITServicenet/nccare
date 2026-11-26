@@ -380,6 +380,12 @@ class RegistrationService {
 	}
 
 	/** When the registration expires unless an account is created, as an ISO 8601 string; '' when it does not. */
+	/** Sign-up page of the portal with this instance's identifier already filled in. */
+	public function getRegisterUrl(): string {
+		$id = $this->appConfig->getValueString(Application::APP_ID, 'installation_id', '');
+		return $this->itsConfig->getPortalUrl() . '/register' . ($id !== '' ? '?ref=' . rawurlencode($id) : '');
+	}
+
 	public function getApprovalExpiresAt(): string {
 		return $this->appConfig->getValueString(Application::APP_ID, 'approval_expires_at', '');
 	}

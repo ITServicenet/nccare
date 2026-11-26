@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OCA\NCCare\AppInfo;
 
 use OCA\NCCare\Listener\LoginFailedListener;
+use OCA\NCCare\Notification\Notifier;
 use OCP\AppFramework\App;
 use OCP\AppFramework\Bootstrap\IBootContext;
 use OCP\AppFramework\Bootstrap\IBootstrap;
@@ -21,6 +22,7 @@ class Application extends App implements IBootstrap {
 
 	public function register(IRegistrationContext $context): void {
 		$context->registerEventListener(AnyLoginFailedEvent::class, LoginFailedListener::class);
+		$context->registerNotifierService(Notifier::class);
 	}
 
 	public function boot(IBootContext $context): void {

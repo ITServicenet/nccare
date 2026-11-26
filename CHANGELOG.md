@@ -3,6 +3,21 @@
 All notable changes to NC Care are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
+## 1.0.8 - 2026-11-26
+
+### Added
+- A reminder in the Nextcloud notification list, for the administrators, while the instance has no account on the
+  portal, approved or not: at most one every three days, withdrawn as soon as the account exists or the registration
+  expires.
+- The sign-up link in the app opens the portal page with the instance identifier already filled in.
+
+### Changed
+- "Reset registration" is now "Register again with a new identifier", under "Advanced options": it opens by itself
+  only when the registration failed or expired, and says when to use it.
+- The waiting-for-approval notice no longer ends with "Nothing else is needed".
+- Store description: the steps now say where to find the first evaluation and the portal link, and no longer
+  mention the weekly summary.
+
 ## 1.0.7 - 2026-11-16
 
 ### Added
